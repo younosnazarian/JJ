@@ -32,6 +32,16 @@ background: '/img/posts/01.jpg'
 <div class="statement" style="display:block;">user@host# <kbd class="user-typing" v-pre="">set routing-instances isp1 interface
 ge-0/0/2.0</kbd></div>
 
+<ol type="1"><li id="jd0e398" style="">Configure routing instances.<div dir="ltr" id="jd0e401" class="example"><sw-code><template v-pre=""><div class="statement" style="display:block;">[edit ]</div><div class="statement" style="display:block;">user@host# <kbd class="user-typing" v-pre="">set routing-instances isp1 instance-type
+virtual-router</kbd></div><div class="statement" style="display:block;">user@host# <kbd class="user-typing" v-pre="">set routing-instances isp1 interface
+ge-0/0/2.0</kbd></div><div class="statement" style="display:block;">user@host# <kbd class="user-typing" v-pre="">set routing-instances isp1 routing-options
+static route 10.0.0.0/8 next-table inet.0</kbd></div><div class="statement" style="display:block;">user@host# <kbd class="user-typing" v-pre="">set routing-instances isp1 routing-options
+static route 0.0.0.0/0 next-hop 192.0.2.20</kbd></div><div class="statement" style="display:block;">user@host# <kbd class="user-typing" v-pre="">set routing-instances isp2 instance-type
+virtual-router</kbd></div><div class="statement" style="display:block;">user@host# <kbd class="user-typing" v-pre="">set routing-instances isp2 interface
+ge-0/0/3.0</kbd></div><div class="statement" style="display:block;">user@host# <kbd class="user-typing" v-pre="">set routing-instances isp2 routing-options
+static route 10.0.0.0/8 next-table inet.0</kbd></div><div class="statement" style="display:block;">user@host# <kbd class="user-typing" v-pre="">set routing-instances isp2 routing-options
+static route 0.0.0.0/0 next-hop 198.51.100.251</kbd></div></template></sw-code></div></li>
+
 <p>Spaceflights cannot be stopped. This is not the work of any one man or even a group of men. It is a historical process which mankind is carrying out in accordance with the natural laws of human development.</p>
 
 <h2 class="section-heading">Reaching for the Stars</h2>
