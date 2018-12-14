@@ -6,8 +6,10 @@ date:   2018-12-13 23:45:13 -0400
 background: '/img/posts/01.jpg'
 ---
 
-<h3><a id="Level_BeginnerIntermediate_0"></a>Level: Beginner-Intermediate</h3>
+<h4><a id="Level_BeginnerIntermediate_0"></a>Level: Beginner-Intermediate</h3>
+
 <h2><a id="Introduction_2"></a>Introduction</h2>
+
 <h3><a id="What_this_is_all_about_4"></a>What this is all about?</h3>
 <p>FromScratch is about imagining a real-world scenario with its demands, and how to address those demands FromScratch. I’ve been thinking about creating such contents for quite a while; however, I have never had the chance to do so, mainly for two reasons: I’ve been busy and lazy!</p>
 <p>You can always find gazillions of How-tos on the Internet. How-tos are a quick way to see how to get something done, but many of them only address the partial and merely relative pieces of configuration. They do not reveal the entire configuration and how to adapt it under different circumstances.<br>
@@ -122,7 +124,7 @@ commit complete
 root@SRX#
 
 </code></pre>
-<p>Right after committing, the command prompt is reflecting the hostname separated from the username by an <strong>@</strong> sign.</p>
+<p><em>Right after committing, the command prompt is reflecting the hostname separated from the username by an <strong>@</strong> sign.</em></p>
 <ul>
 <li><strong>Management IP:</strong> This is the IP you use for managing/monitoring your device. On most new physical SRX appliances even more recent versions of virtual appliances, you will find a dedicated ethernet port for management purposes. This dedicated port named <strong>“fxp0”</strong> and terminated in control plane itself.</li>
 </ul>
@@ -144,8 +146,7 @@ root@SRX# commit
 commit complete
 
 </code></pre>
-<pre style="background-color: #f4f6f8;"><code>NOTE: In case of lacking such port, you may use any standard network ports for management purposes – unlike fxp0 these ports are terminated in the data plane, and the traffic has to go through a link called &quot;internal link&quot; to enter the control plane. However, membership to the &quot;management&quot; functional zone along with setting up host-inbound-traffic is mandatory for when you utilize regular networking ports for management purposes.
-</code></pre>
+<p><em>NOTE: In case of lacking such port, you may use any standard network ports for management purposes – unlike fxp0 these ports are terminated in the data plane, and the traffic has to go through a link called “internal link” to enter the control plane. However, membership to the “management” functional zone along with setting up host-inbound-traffic is mandatory for when you utilize regular networking ports for management purposes.</em></p>
 <ul>
 <li><strong>Management Protocols:</strong> Protocols that without them you will leave with no way to connect to your appliance and manage it. The mentioned protocols include <strong>SSH</strong>, <strong>HTTPS</strong>, <strong>HTTP</strong>, <strong>telnet</strong>, etc. Even though I would only use <strong>SSH</strong> to manage an SRX appliance, I have also included the configuration required for <strong>HTTPS</strong> for those who prefer <strong>GUI</strong>.</li>
 </ul>
@@ -246,14 +247,16 @@ By committing these commands any event that has the level of emergency immediate
 root@SRX# edit system syslog 
 
 [edit system syslog]
-root@SRX# set user * any emergency 
-These commands will send everything to the syslog server.
+root@SRX# set user * any emergency
 
-[edit system syslog]
+</code></pre>
+<p>These commands will send everything to the syslog server.</p>
+<pre style="background-color: #f4f6f8;"><code>[edit system syslog]
 root@SRX# set host 192.168.100.204 any any 
-Finally, these commands will store authentication, auditing, and processes-related events respectively in different three files.
 
-[edit system syslog]
+</code></pre>
+<p>Finally, these commands will store authentication, auditing, and processes-related events respectively in different three files.</p>
+<pre style="background-color: #f4f6f8;"><code>[edit system syslog]
 root@SRX# set file Authentication authorization info 
 
 [edit system syslog]
