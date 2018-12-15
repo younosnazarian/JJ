@@ -8,10 +8,10 @@ background: '/img/posts/2018-12-13/Cover.jpg'
 
 <h3><a id="Level_BeginnerIntermediate_0"></a>Level: Beginner-Intermediate</h3>
 <h2><a id="Introduction_2"></a>Introduction</h2>
-<h3><a id="What_this_is_all_about_4"></a>What this is all about?</h3>
+<h3><a id="What_this_is_all_about_4"></a>What is this all about?</h3>
 <p>FromScratch is about imagining a real-world scenario with its demands, and how to address those demands FromScratch. I’ve been thinking about creating such contents for quite a while; however, I have never had the chance to do so, mainly for two reasons: I’ve been busy and lazy!</p>
 <p>You can always find gazillions of How-tos on the Internet. How-tos are a quick way to see how to get something done, but many of them only address the partial and merely relative pieces of configuration. They do not reveal the entire configuration and how to adapt it under different circumstances.<br>
-In this series of articles, I will show you how to get things done FromScratch. It means: I literally will <strong>delete</strong> everything off the appliance before I start setting it up. Thus, there will be no confusion, no missing parts, no assumption of some pre-configured commands; unless, I have already explained it in another article, or an initial pre-config file. I will not only type every command and explain the reason behind it, but also create a video implementing it. I suggest that you first read the article and then start watching its video.</p>
+In this series of articles, I will show you how to get things done FromScratch. It means: I literally will <strong>delete</strong> everything off the appliance before I start setting it up. Thus, there will be no confusion, no missing parts, no assumption of some pre-configured commands; unless, I have already explained it in another article, or an initial pre-config file. I will not only type every command and tell the reason behind it, but also create a video implementing it. I suggest that you first read the article and then start watching its video.</p>
 <blockquote>
 <p>FromScratch series is about<br>
 imagining a real-world scenario with its demands,<br>
@@ -29,11 +29,14 @@ If you have never heard of the terminology mentioned above, the contents of this
 <ul>
 <li><strong>Configuring Basics on an SRX</strong></li>
 <li><strong>Hardening an SRX</strong></li>
-<li><strong>Scenario and Topologies</strong></li>
 </ul>
+
+<h3><a id="This_article_discusses_28"></a>Scenario and Topologies</h3>
+
 <p><strong>Kryptomesh</strong>, this is the name of a hypothetical company – so far – that is just going to start operating in the next two weeks. Marina, who is the company’s owner – and well, very ambitious Spanish girl – rented a cozy office in Palo Alto, CA.<br>
-She is aiming that one day her company becomes a legendary establishment. Marina is planning to buy many pieces of networking equipment for her office such as PCs, switches, servers, and a firewall. I suggested her to get an SRX firewall for her office. And since I happened to be his boyfriend, I am the one who is going to configure it – probably for free! We haven’t gotten anything but a physical server, a small switch and an SRX firewall. I am planning to install ESXi on the physical server and create a few virtual machines that are going to play roles such as monitoring server, NTP server, AAA server, DNS server, etc. All these virtual machines, for now, are located in the management cloud. We haven’t ordered PCs, Internet link, and any other components. Remember, this is merely about SRX itself configuration. We shall discuss the rest in other articles. Below, you will find the topology:</p>
+She is aiming that one day her company becomes a legendary establishment and is planning to buy many pieces of networking equipment for her office such as PCs, switches, servers, and a firewall. I suggested her to get an SRX firewall for her office. And since I happened to be his fiancee, I am the one who is going to configure it – probably for free! We haven’t gotten anything but a physical server, a small switch and an SRX firewall. I am planning to install ESXi on the physical server and create a few virtual machines that are going to play roles such as monitoring server, NTP server, AAA server, DNS server, etc. All these virtual machines, for now, are located in the management cloud. We haven’t yet ordered PCs, Internet link, and any other components. Remember, this is merely about SRX itself configuration. We shall discuss the server configuration in other articles. Below, you will find the topology:</p>
 <img class="img-fluid" src="/JJ/img/posts/2018-12-13/Topology.png" alt="Network Topology">
+
 <h3><a id="The_topology_above_has_the_following_components_37"></a>The topology above, has the following components:</h3>
 <ul>
 <li><strong>SRX:</strong> It is either vSRX version 12 or 18 on EVE or ESXi platforms.</li>
@@ -43,14 +46,15 @@ She is aiming that one day her company becomes a legendary establishment. Marina
 <li><strong>Syslog Server:</strong> A basic Syslog Server on a Debian Linux.</li>
 <li><strong>NSM Server:</strong> PRTG</li>
 <li><strong>Me:</strong> A MacBook laptop</li>
-<li><strong>Management Cloud:</strong> It is an Out-of-Band Management (OBM) network containing all servers that provide services for all networking devices. It may contains NTP server, monitoring server, AAA server, SNMP sever and other NOC-related services. Although our network is very small and having a management cloud seems redundant but we think big.</li>
+<li><strong>Management Cloud:</strong> It is an Out-of-Band Management (OBM) network containing all servers that provide services for all networking devices. It may include NTP server, monitoring server, AAA server, SNMP server, and other NOC-related services. Although our network is tiny and having a management cloud seems redundant, but we think big.
+Let’s Begin</li>
 </ul>
 <h3><a id="Lets_Begin_48"></a>Let’s Begin</h3>
 <p>Your CLI looks like below once you connect your console cable to your appliance and press enter on your “terminal emulator” blank page for the first time:</p>
 <pre style="background-color: #f4f6f8;"><code>login:
 
 </code></pre>
-<p>A login prompt is waiting for your input. All you have to type is the word <strong>“root”</strong> following by an Enter. Your prompt is ending with <strong>#</strong> now (in previous and some Junos versions it would be a <strong>%</strong> sign), which is a unix/linux-based shell. You may use this environment only in rare occasions during your appliance lifetime and as far as I concern, it is only root user that goes directly to this environment after login. Then you type <strong>cli</strong> to enter to <strong>“operational mode”</strong>. If you see <strong>&gt;</strong> at the end of your prompt , it means that your are in operational mode. All other users except root enter directly to this mode, which makes it unnecessary to type <strong>cli</strong> for other non-root use.</p>
+<p>A login prompt is waiting for your input. All you have to type is the word <strong>“root”</strong> following by an Enter. Your prompt is ending with <strong>#</strong> now (in previous and some Junos versions it would be a <strong>%</strong> sign), which is a Unix/Linux-based shell. You may use this environment only on rare occasions during your appliance lifetime, and as far as I concern, it is only root user that goes directly to this environment after login. Then you type <strong>cli</strong> to enter to <strong>“operational mode”</strong>. If you see <strong>&gt;</strong> at the end of your prompt, it means that you are in operational mode. All other users except root enter directly to this mode, which makes it unnecessary to type <strong>cli</strong> for other non-root use.</p>
 <pre style="background-color: #f4f6f8;"><code>loging: root
 
 --- JUNOS 18.1R2.5 Kernel 64-bit JNPR-11.0-20180518.0669ae9_buil
@@ -74,7 +78,7 @@ Entering configuration mode
 root#
 
 </code></pre>
-<p>Finally we delete everything off the device ignoring factory default configuration. This is a FromScratch guide after all! You may verify it by issuing <strong>show</strong> command.</p>
+<p>Finally, we delete everything off the device ignoring factory default configuration. This is a FromScratch guide after all! You may verify it by issuing <strong>show</strong> command.</p>
 <pre style="background-color: #f4f6f8;"><code>[edit]
 root# delete 
 This will delete the entire configuration
@@ -92,7 +96,7 @@ root#
 <p>Perfect! Now let’s configure our SRX. Before continue reading, please scroll up and glance over the topology again.</p>
 <h3><a id="Configuring_Basics_104"></a>Configuring Basics</h3>
 <ul>
-<li><strong>Root password:</strong> You cannot commit an empty configuration nor a configuration without a root password. Configuring the root password is mandatory. It should has minimum length of 6 and it requires change of case, digits or punctuation.You need to enter the password twice. My password is: <strong>Abc123@</strong>*</li>
+<li><strong>Root password:</strong> You cannot commit an empty configuration nor a configuration without a root password. Configuring the root password is mandatory. It should have a minimum length of 6, and it requires a change of case, digits or punctuation. You need to enter the password twice. My password is: <strong>Abc123@</strong></li>
 </ul>
 <pre style="background-color: #f4f6f8;"><code>root# set system root-authentication plain-text-password 
 New password:
@@ -166,7 +170,7 @@ ping: sendto: No route to host
 <p>The name <strong><a href="http://yahoo.com">yahoo.com</a></strong> successfully resolved into its IP address <strong>“72.30.35.10”</strong>, however; it is not reachable. It’s because we haven’t yet defined a default route to provide Internet connectivity, but evidently, the DNS is working perfectly. I added “inet” after the ping command to make sure that the name will be resolved into IPv4.</p>
 <p><em>NOTE: Since in this scenario an internal DNS server is available and it’s reachable within the same subnet, we do not need to have a route.</em></p>
 <ul>
-<li><strong>Date &amp; Time:</strong> The commands are self-explanatory, but you have to keep it in mind to set the time zone and commit your configuration before setting up the time itself. The time could be set manually or be retrieved from an NTP server. Both of which has been shown. <em>NOTE: You use the command “run” when you want to execute the operational-mode commands in the configuration-mode. It is similar to the command “do” on Cisco IOS.</em></li>
+<li><strong>Date &amp; Time:</strong> The commands are self-explanatory, but you have to keep it in mind to set the time zone and commit your configuration before setting up the time itself. The time could be set manually or be retrieved from an NTP server. Both of which has been shown. <em>NOTE: You use the command “run” when you want to execute the operational-mode commands in the configuration mode. It is similar to the command “do” on Cisco IOS.</em></li>
 </ul>
 <pre style="background-color: #f4f6f8;"><code>[edit]
 root@SRX# set system time-zone America/Los_Angeles 
@@ -202,7 +206,7 @@ commit complete
 [edit]
 
 </code></pre>
-<p>Lets verify the NTP satatus</p>
+<p>Lets verify the NTP status</p>
 <pre style="background-color: #f4f6f8;"><code>root@SRX# run show ntp associations    
    remote         refid           st t when poll reach   delay   offset  jitter
 ===============================================================================
@@ -211,8 +215,8 @@ NOTE: The * sing next to the server shows that this server has been chosen for s
 
 </code></pre>
 <ul>
-<li><strong>Control Plane Syslog:</strong> It is about your appliance reporting what are happening inside your control plane. Saying hello to your neighboring OSFP router is an event as well as executing every single command you type or losing one the cooling fans. We probably don’t need every thing that happens behind the scene, so you need to tell your appliance what to report – it determines by facility, severity, and pattern-matching – and where to send it. For start, I would like to log five types of events, three of them goes into separate files, one of them to a syslog server, and the last one appears directly on users’ terminal. I have decided to store my logs in structured format, they would be more illegible, however; they will take slightly more space to store.<br>
-By committing these commands any event that has the level of emergency immediately appears on any logged-in users’ screen.</li>
+<li><strong>Control Plane Syslog:</strong> It is about your appliance reporting what is happening inside your control plane. Saying hello to your neighboring OSFP router is an event as well as executing every single command you type or losing one the cooling fans. We probably don’t need everything that happens behind the scene, so you need to tell your appliance what to report – it determines by facility, severity, and pattern-matching – and where to send it. For a start, I would like to log five types of events, three of them goes into separate files, one of them to a syslog server, and the last one appears directly on users’ terminal. I have decided to store my logs in a structured format, and they would be more illegible, however; they will take slightly more space to store.<br>
+By committing these commands, any event that has the level of emergency immediately appears on any logged-in users’ screen.</li>
 </ul>
 <pre style="background-color: #f4f6f8;"><code>[edit]
 root@SRX# edit system syslog 
@@ -262,7 +266,8 @@ commit complete
 
 </code></pre>
 <ul>
-<li><strong>SNMP:</strong> The propose of this really old protocol is mainly for two purposes, management and monitoring. Various ways could be used to manage your SRX appliance but SNMP is not one of those. Therefore, the purpose of SNMP on SRX appliance is mainly for monitoring. Two types of messages we have when working with SNMP: SNMP traps(push) and SNMP pull. The pull functions is basically when your NMS server probe your device – in a regular time period – to pull information about CPU usage, interfaces, policies, etc. The purpose of SNMP trap or push is when something happens and an SRX appliance notify the server about that particular incident. The incident could be changing an interface status from up to down, or whenever some new changes applies on the appliance. Here we will configure SNMP v2c, the community will be Juonos@123@, and the only NMS server 192.168.100.205 will be able to pull SNMP OIDs. The authorization level is read-only. SNMP traps will send any configuration change and interface up/down. You can also define SNMP name, description, and location.</li>
+<li><strong>SNMP:</strong> The propose of this ancient protocol is mainly for two purposes, management and monitoring. Various ways could be used to manage your SRX appliance, but SNMP is not one of those. Therefore, the goal of SNMP on SRX appliance is mainly for monitoring. Two types of messages we have when working with SNMP: SNMP traps(push) and SNMP pull. The pull functions are basically when your NMS server probe your device – in a regular period – to pull information about CPU usage, interfaces, policies, etc. The purpose of SNMP trap or push is when something happens, and an SRX appliance notifies the server about that particular incident. The incident could be changing an interface status from up to down, or whenever some new changes apply to the appliance. Here we will configure SNMP v2c, the community will be Juonos@123@, and the only NMS server 192.168.100.205 will be able to pull SNMP OIDs. The authorization level is read-only. SNMP traps will send any configuration change and interface up/down. You can also define SNMP name, description, and location.
+</li>
 </ul>
 <pre style="background-color: #f4f6f8;"><code>[edit]
 root@SRX# edit snmp    
@@ -305,7 +310,7 @@ commit complete
 
 </code></pre>
 <ul>
-<li><strong>Local Users:</strong> The only pre-defined user on an SRX is the root user. Even if you want to have full permission access it is not recommended to use the root user. I can think of a few reasons. One, there are things that you cannot change about root user, such as idle timeout. Two, for the most tasks, even if you are the admins of the system, you won’t need access as much as the root user, it’s better to create a user with slightly limited access that could do day-to-day tasks. Using root user for every-day use, you expose the root user credential at the risk of being compromised. Here we will define an Admin user that has almost every kind of access except a few things. For example, even Admins users shouldn’t be able to change root password or access the shell. First we need to create a class. Then set up the class with its permissions, authorization and other things. Finally we create a user name, define a password for it and make it a member of the Admins class. I set the password as: <strong>Younos123@</strong></li>
+<li><strong>Local Users:</strong> The only pre-defined user on an SRX is the root user. Even if you want to have full permission access, it is not recommended to use the root user. I can think of a few reasons. One, there are things that you cannot change about root user, such as idle timeout. Two, for the most tasks, even if you are the admins of the system, you won’t need access as much as the root user, it’s better to create a user with slightly limited access that could do day-to-day tasks. Using root user for every-day use, you expose the root user credential at the risk of being compromised. Here we will define an Admin user that has almost every kind of access except a few things. For example, even Admins users shouldn’t be able to change the root password or access the shell. First, we need to create a class. Then set up the class with its permissions, authorization and other things. Finally, we create a username, define a password for it and make it a member of the Admins class. I set the password as: <strong>Younos123@</strong></li>
 </ul>
 <pre style="background-color: #f4f6f8;"><code>[edit]
 root@SRX# edit system login 
@@ -352,7 +357,7 @@ commit complete
 
 </code></pre>
 <ul>
-<li><strong>TACATACACS+/RADIUS:</strong> Local database for storing user credentials and also for a big number of appliances is not either efficient nor rational. If you want to add any user to manage the appliances or change anything, you will have to do it on every single one of them. Besides, you will left with no way of logging users activities and the commands they have executed. Therefore, for the sake of consistency, efficiency, simplicity and many other reasons, a central database would need to be used.<br>
+<li><strong>TACATACACS+/RADIUS:</strong> the Local database for storing user credentials and also for a significant number of appliances is not either efficient nor rational. If you want to add any user to manage the appliances or change anything, you will have to do it on every single one of them. Besides, you will be left with no way of logging users activities and the commands they have executed. Therefore, for the sake of consistency, efficiency, simplicity and many other reasons, a central database would need to be used.<br>
 A central location to not only store all users’ credentials and authorization settings but also to record a history of their log-ins and commands they ran. The server that stores such a database could render its service using either TACACS+ or RADIUS protocols. First, we need to configure the IP address and the secret key of the server.</li>
 </ul>
 <pre style="background-color: #f4f6f8;"><code>[edit]
@@ -367,7 +372,7 @@ root@SRX# set system authentication-order radius
 root@SRX# set system authentication-order password 
 
 </code></pre>
-<p>Third, login classes, credentials and template users respectively. The rest of the settings are applicable on the AAA server.</p>
+<p>Third, login classes, credentials and template users respectively. The rest of the settings are applied on the AAA server.</p>
 <pre style="background-color: #f4f6f8;"><code>[edit]
 root@SRX# edit system login 
 
@@ -442,7 +447,7 @@ commit complete
             uid 2004;
             class Admins;
             authentication {            
-                encrypted-password &quot;$6$XyCo2lPz$Omnr.SnnoEFTQt4/ao8E1dGMskIfqBWnpLSi4VG9iRxkpKZyG8TAg3RJxDwCRKwl1aFBEE2ekN50QyulNRoTe.&quot;; ## SECRET-DATA
+                encrypted-password &quot;$6$RjHfSjsL$Y/S13Kq37Ja/GeaoxI7i5ttgg1K.r4Qie4mqlPWeQpPkD/r2rTC9hSpHKD9ul9f0PUOQzNUeTXabi.vaPukuv/&quot;; ## SECRET-DATA
             }
         }
     }
@@ -544,7 +549,7 @@ set system login user Remote-Admins uid 2002
 set system login user Remote-Admins class Remote-Admins
 set system login user Younos uid 2004
 set system login user Younos class Admins
-set system login user Younos authentication encrypted-password &quot;$6$XyCo2lPz$Omnr.SnnoEFTQt4/ao8E1dGMskIfqBWnpLSi4VG9iRxkpKZyG8TAg3RJxDwCRKwl1aFBEE2ekN50QyulNRoTe.&quot;
+set system login user Younos authentication encrypted-password &quot;$6$RjHfSjsL$Y/S13Kq37Ja/GeaoxI7i5ttgg1K.r4Qie4mqlPWeQpPkD/r2rTC9hSpHKD9ul9f0PUOQzNUeTXabi.vaPukuv/&quot;
 set system services ssh root-login allow
 set system services web-management https system-generated-certificate
 set system syslog user * any emergency
