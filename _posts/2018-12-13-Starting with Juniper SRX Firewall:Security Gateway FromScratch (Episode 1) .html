@@ -42,7 +42,7 @@ She is aiming that one day her company becomes a legendary establishment and is 
 <li><strong>SRX:</strong> It is either vSRX version 12 or 18 on EVE or ESXi platforms.</li>
 <li><strong>NTP Server:</strong> A basic NTP server on a Debian Linux.</li>
 <li><strong>DNS Server:</strong> A basic DNS server on a Debian Linux.</li>
-<li><strong>AAA Server:</strong> Cisco ISE server</li>
+<li><strong>AAA Server:</strong> FreeRADIUS on a Debian Linux</li>
 <li><strong>Syslog Server:</strong> A basic Syslog Server on a Debian Linux.</li>
 <li><strong>NSM Server:</strong> PRTG</li>
 <li><strong>Me:</strong> A MacBook laptop</li>
@@ -54,7 +54,7 @@ Let’s Begin</li>
 <pre style="background-color: #f4f6f8;"><code>login:
 
 </code></pre>
-<p>A login prompt is waiting for your input. All you have to type is the word <strong>“root”</strong> following by an Enter. Your prompt is ending with <strong>#</strong> now (in previous and some Junos versions it would be a <strong>%</strong> sign), which is a Unix/Linux-based shell. You may use this environment only on rare occasions during your appliance lifetime, and as far as I concern, it is only root user that goes directly to this environment after login. Then you type <strong>cli</strong> to enter to <strong>“operational mode”</strong>. If you see <strong>&gt;</strong> at the end of your prompt, it means that you are in operational mode. All other users except root enter directly to this mode, which makes it unnecessary to type <strong>cli</strong> for other non-root use.</p>
+<p>A login prompt is waiting for your input. All you have to type is the word <strong>“root”</strong> following by an Enter. Your prompt is ending with <strong>#</strong> now (in previous and some Junos versions it would be a <strong>%</strong> sign), which is a Unix/Linux-based shell. You may use this environment only on rare occasions during your appliance lifetime, and as far as I'm concerned, it is only root user that goes directly to this environment after login. Then you type <strong>cli</strong> to enter to <strong>“operational mode”</strong>. If you see <strong>&gt;</strong> at the end of your prompt, it means that you are in operational mode. All other users except root enter directly to this mode, which makes it unnecessary to type <strong>cli</strong> for other non-root use.</p>
 <pre style="background-color: #f4f6f8;"><code>loging: root
 
 --- JUNOS 18.1R2.5 Kernel 64-bit JNPR-11.0-20180518.0669ae9_buil
@@ -78,7 +78,7 @@ Entering configuration mode
 root#
 
 </code></pre>
-<p>Finally, we delete everything off the device ignoring factory default configuration. This is a FromScratch guide after all! You may verify it by issuing <strong>show</strong> command.</p>
+<p>Finally, we delete everything off the device, ignoring factory default configuration. This is a FromScratch guide after all! You may verify it by issuing <strong>show</strong> command.</p>
 <pre style="background-color: #f4f6f8;"><code>[edit]
 root# delete 
 This will delete the entire configuration
@@ -107,7 +107,7 @@ root# commit
 commit complete
 
 </code></pre>
-<p>When you enter a clear text password, the Junos OS calculates the MD5 hash of the password and save the hashed version it. The word “encrypted” is not accurate.</p>
+<p><em>NOTE: When you enter a clear text password, the Junos OS calculates the MD5 hash of the password and save the hashed version it. The word “encrypted” is not accurate.</em></p>
 <ul>
 <li><strong>Hostname:</strong> You need to pick a name for your device. This name could represent its function or model or location or some random name. The name of the device is usually a mixture of personal preferences and the company’s naming policy (if we have such a policy). I picked the name <strong>“SRX”</strong> for my device. Your prompt reflects your hostname after commit.</li>
 </ul>
@@ -121,7 +121,7 @@ commit complete
 root@SRX#
 
 </code></pre>
-<p><em>Right after committing, the command prompt is reflecting the hostname separated from the username by an <strong>@</strong> sign.</em></p>
+<p><em>NOTE: Right after committing, the command prompt is reflecting the hostname separated from the username by an <strong>@</strong> sign.</em></p>
 <ul>
 <li><strong>Management IP:</strong> This is the IP you use for managing/monitoring your device. On most new physical SRX appliances even more recent versions of virtual appliances, you will find a dedicated ethernet port for management purposes. This dedicated port named <strong>“fxp0”</strong> and terminated in control plane itself.</li>
 </ul>
@@ -192,9 +192,10 @@ System booted: 2018-11-27 04:01:48 PST (00:50:13 ago)
 Protocols started: 2018-11-27 04:05:29 PST (00:46:32 ago)
 Last configured: 2018-11-24 17:43:09 PST (2d 11:08 ago) by root
  4:52AM  up 50 mins, 2 users, load averages: 0.43, 0.59, 0.90
-NOTE: If you don't have a local NTP server set up, you may use any public NTP server available on Internet. Simply google: public NTP servers list. You will find plenty of them here: https://www.ntppool.org/
-
+ 
 </code></pre>
+<p><em>NOTE: If you don't have a local NTP server set up, you may use any public NTP server available on Internet. Simply google: public NTP servers list. You will find plenty of them here: https://www.ntppool.org/</em></p>
+
 <ul>
 <li><strong>NTP:</strong> Time is not only an object in physics but also a must for network appliances. One example of its significance could be the time when you want to forensic a security breach into your network. At some point of your investigation, correlating events generated by various appliances and services is inevitable. Each event has a timestamp; coherence and consistency among these time stamps across all your machines will go a long way in tracking an activity efficiently. By having an NTP server in your network, you will assure that time on all your services and appliances is precise and synchronized.</li>
 </ul>
@@ -211,9 +212,10 @@ commit complete
    remote         refid           st t when poll reach   delay   offset  jitter
 ===============================================================================
 *192.168.100.202  62.201.225.9     3 -    2   64    1    1.718   18.258   1.875
-NOTE: The * sing next to the server shows that this server has been chosen for syncing. If you don't have a local NTP server set up, you may use any public NTP server available on Internet. Simply google: public NTP servers list. You will find tons of them here: https://www.ntppool.org/
 
 </code></pre>
+<p><em>NOTE: The * sing next to the server shows that this server has been chosen for syncing. If you don't have a local NTP server set up, you may use any public NTP server available on Internet. Simply google: public NTP servers list. You will find tons of them here: https://www.ntppool.org/</em></p>
+
 <ul>
 <li><strong>Control Plane Syslog:</strong> It is about your appliance reporting what is happening inside your control plane. Saying hello to your neighboring OSFP router is an event as well as executing every single command you type or losing one the cooling fans. We probably don’t need everything that happens behind the scene, so you need to tell your appliance what to report – it determines by facility, severity, and pattern-matching – and where to send it. For a start, I would like to log five types of events, three of them goes into separate files, one of them to a syslog server, and the last one appears directly on users’ terminal. I have decided to store my logs in a structured format, and they would be more illegible, however; they will take slightly more space to store.<br>
 By committing these commands, any event that has the level of emergency immediately appears on any logged-in users’ screen.</li>
@@ -323,6 +325,7 @@ root@SRX# set class Admins login-alarms
 
 [edit system login]
 root@SRX# set class Admins permissions all 
+
 [edit system login]
 root@SRX# set class Admins deny-commands &quot;(set cli idle-timeout)|(request system software)|(request system zeroize)|(request chassis)|(start)&quot;
 
