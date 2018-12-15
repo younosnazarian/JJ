@@ -6,10 +6,8 @@ date:   2018-12-13 23:45:13 -0400
 background: '/img/posts/2018-12-13/Cover.jpg'
 ---
 
-<h4><a id="Level_BeginnerIntermediate_0"></a>Level: Beginner-Intermediate</h3>
-
+<h3><a id="Level_BeginnerIntermediate_0"></a>Level: Beginner-Intermediate</h3>
 <h2><a id="Introduction_2"></a>Introduction</h2>
-
 <h3><a id="What_this_is_all_about_4"></a>What this is all about?</h3>
 <p>FromScratch is about imagining a real-world scenario with its demands, and how to address those demands FromScratch. I’ve been thinking about creating such contents for quite a while; however, I have never had the chance to do so, mainly for two reasons: I’ve been busy and lazy!</p>
 <p>You can always find gazillions of How-tos on the Internet. How-tos are a quick way to see how to get something done, but many of them only address the partial and merely relative pieces of configuration. They do not reveal the entire configuration and how to adapt it under different circumstances.<br>
@@ -33,19 +31,21 @@ If you have never heard of the terminology mentioned above, the contents of this
 <li><strong>Hardening an SRX</strong></li>
 <li><strong>Scenario and Topologies</strong></li>
 </ul>
-<p><strong>Kryptonious</strong>, this is the name of a hypothetical company – so far – that is just going to start operating in the next two weeks. Marina, who is the company’s owner – and well, very ambitious Spanish girl – rented a cozy office in Palo Alto, CA.<br>
+<p><strong>Kryptomesh</strong>, this is the name of a hypothetical company – so far – that is just going to start operating in the next two weeks. Marina, who is the company’s owner – and well, very ambitious Spanish girl – rented a cozy office in Palo Alto, CA.<br>
 She is aiming that one day her company becomes a legendary establishment. Marina is planning to buy many pieces of networking equipment for her office such as PCs, switches, servers, and a firewall. I suggested her to get an SRX firewall for her office. And since I happened to be his boyfriend, I am the one who is going to configure it – probably for free! We haven’t gotten anything but a physical server, a small switch and an SRX firewall. I am planning to install ESXi on the physical server and create a few virtual machines that are going to play roles such as monitoring server, NTP server, AAA server, DNS server, etc. All these virtual machines, for now, are located in the management cloud. We haven’t ordered PCs, Internet link, and any other components. Remember, this is merely about SRX itself configuration. We shall discuss the rest in other articles. Below, you will find the topology:</p>
 <img class="img-fluid" src="/JJ/img/posts/2018-12-13/Topology.png" alt="Network Topology">
 <h3><a id="The_topology_above_has_the_following_components_37"></a>The topology above, has the following components:</h3>
 <ul>
-<li>SRX: It is either vSRX version 12 or 18 on EVE or ESXi platforms.</li>
-<li>NTP Server: A basic NTP server on a Debian Linux.</li>
-<li>DNS Server: A basic DNS server on a Debian Linux.</li>
-<li>AAA Server: Cisco ISE server</li>
-<li>Me: A MacBook laptop</li>
-<li>Management Cloud: It is an Out-of-Band Management (OBM) network containing all servers that provide services for all networking devices. It may contains NTP server, monitoring server, AAA server, SNMP sever and other NOC-related services. Although our network is very small and having a management cloud seems redundant but we think big.</li>
+<li><strong>SRX:</strong> It is either vSRX version 12 or 18 on EVE or ESXi platforms.</li>
+<li><strong>NTP Server:</strong> A basic NTP server on a Debian Linux.</li>
+<li><strong>DNS Server:</strong> A basic DNS server on a Debian Linux.</li>
+<li><strong>AAA Server:</strong> Cisco ISE server</li>
+<li><strong>Syslog Server:</strong> A basic Syslog Server on a Debian Linux.</li>
+<li><strong>NSM Server:</strong> PRTG</li>
+<li><strong>Me:</strong> A MacBook laptop</li>
+<li><strong>Management Cloud:</strong> It is an Out-of-Band Management (OBM) network containing all servers that provide services for all networking devices. It may contains NTP server, monitoring server, AAA server, SNMP sever and other NOC-related services. Although our network is very small and having a management cloud seems redundant but we think big.</li>
 </ul>
-<h3><a id="Lets_Begin_46"></a>Let’s Begin</h3>
+<h3><a id="Lets_Begin_48"></a>Let’s Begin</h3>
 <p>Your CLI looks like below once you connect your console cable to your appliance and press enter on your “terminal emulator” blank page for the first time:</p>
 <pre style="background-color: #f4f6f8;"><code>login:
 
@@ -90,17 +90,13 @@ root#
 
 </code></pre>
 <p>Perfect! Now let’s configure our SRX. Before continue reading, please scroll up and glance over the topology again.</p>
-<h3><a id="Configuring_Basics_102"></a>Configuring Basics</h3>
+<h3><a id="Configuring_Basics_104"></a>Configuring Basics</h3>
 <ul>
 <li><strong>Root password:</strong> You cannot commit an empty configuration nor a configuration without a root password. Configuring the root password is mandatory. It should has minimum length of 6 and it requires change of case, digits or punctuation.You need to enter the password twice. My password is: <strong>Abc123@</strong>*</li>
 </ul>
 <pre style="background-color: #f4f6f8;"><code>root# set system root-authentication plain-text-password 
 New password:
 Retype new password:
-root# show system 
-root-authentication {
-    encrypted-password &quot;$6$S6eyEo27$RjHmLfSGolBXkGNYlFl4DDw9617glIPEULmAKomYdTBYTD1IYSxA.sbWukJ0lM4fah27EjibFQjRkw5CWJ0J71&quot;; ## SECRET-DATA
-}
 
 [edit]
 root# commit
@@ -112,12 +108,8 @@ commit complete
 <li><strong>Hostname:</strong> You need to pick a name for your device. This name could represent its function or model or location or some random name. The name of the device is usually a mixture of personal preferences and the company’s naming policy (if we have such a policy). I picked the name <strong>“SRX”</strong> for my device. Your prompt reflects your hostname after commit.</li>
 </ul>
 <pre style="background-color: #f4f6f8;"><code>[edit]
-root# set system host-name SRX 
+root# set system host-name SRX
 
-[edit]
-root# show system host-name 
-host-name SRX;
-[edit]
 root# commit
 commit complete
 
@@ -131,16 +123,6 @@ root@SRX#
 </ul>
 <pre style="background-color: #f4f6f8;"><code>[edit]
 root@SRX# set interfaces fxp0.0 family inet address 192.168.100.200/24
-[edit]
-root@SRX# show interfaces 
-fxp0 {
-    unit 0 {
-        family inet {
-            address 192.168.100.200/24;
-        }
-    }
-}
-
 
 [edit]
 root@SRX# commit
@@ -158,17 +140,6 @@ root@SRX# set system services ssh root-login allow
 root@SRX# set system services web-management https system-generated-certificate 
 
 [edit]
-root@SRX# show system services       
-ssh {
-    root-login allow;
-}
-web-management {
-    https {
-        system-generated-certificate;
-    }
-}
-
-[edit]
 root@SRX# commit
 commit complete
 
@@ -179,10 +150,6 @@ A URL contains a series of letters that need to be translated into an IP. You ma
 </ul>
 <pre style="background-color: #f4f6f8;"><code>[edit]
 root@SRX# set system name-server 192.168.100.202 
-
-[edit]
-root@SRX# show system name-server   
-192.168.100.202;
 
 [edit]
 root@SRX# commit
@@ -233,7 +200,10 @@ root@SRX# set system ntp server 192.168.100.202
 root@SRX# commit 
 commit complete
 [edit]
-root@SRX# run show ntp associations    
+
+</code></pre>
+<p>Lets verify the NTP satatus</p>
+<pre style="background-color: #f4f6f8;"><code>root@SRX# run show ntp associations    
    remote         refid           st t when poll reach   delay   offset  jitter
 ===============================================================================
 *192.168.100.202  62.201.225.9     3 -    2   64    1    1.718   18.258   1.875
@@ -371,6 +341,230 @@ commit complete
 
 </code></pre>
 <ul>
-<li><strong>Login message:</strong> Login message is usually is to warn people of au-authorized access and its legal consequences. You basically have to tell them keep out unless you are an authorized person.<br>
-TACATACACS+/RADIUS: Local database for storing user credentials and also for a big number of appliances is not either efficient nor rational. If you want to add any user to manage the appliances or change anything, you will have to do it on every single one of them. Besides, you will left with no way of logging users activities and the commands they have executed. Therefore, for the sake of consistency, efficiency, simplicity and many other reasons, a central database would need to be used. A central location to not only store all users’ credentials and authorization settings but also to record a history of their log-ins and commands they ran. The server that stores such a database could render its service using either TACACS+ or RADIUS protocols. First, we need to configure the IP address and the secret key of the server. Second, we have to tell our appliance about the order of different authentication methods. Third, login classes, credentials and template users. The rest of the settings are applicable on the AAA server.</li>
+<li><strong>Login message:</strong> Login message is usually is to warn people of au-authorized access and its legal consequences. You basically have to tell them keep out unless you are an authorized person.</li>
 </ul>
+<pre style="background-color: #f4f6f8;"><code>[edit]
+root@SRX# set system login message &quot;         ==================================================================================\n\t|                             KRYPTOMESH SECURITY TEAM                             |\n\t| Unauthorized access to this system is forbidden and will be prosecuted by law.   |\n\t| By accessing this system, you agree that your actions may be monitored if        |\n\t| unauthorized usage is suspected.                                                 |\n\t ==================================================================================\n&quot;
+
+[edit]
+root@SRX# commit 
+commit complete
+
+</code></pre>
+<ul>
+<li><strong>TACATACACS+/RADIUS:</strong> Local database for storing user credentials and also for a big number of appliances is not either efficient nor rational. If you want to add any user to manage the appliances or change anything, you will have to do it on every single one of them. Besides, you will left with no way of logging users activities and the commands they have executed. Therefore, for the sake of consistency, efficiency, simplicity and many other reasons, a central database would need to be used.<br>
+A central location to not only store all users’ credentials and authorization settings but also to record a history of their log-ins and commands they ran. The server that stores such a database could render its service using either TACACS+ or RADIUS protocols. First, we need to configure the IP address and the secret key of the server.</li>
+</ul>
+<pre style="background-color: #f4f6f8;"><code>[edit]
+root@SRX# set system radius-server 192.168.100.203 secret Junos123@
+
+</code></pre>
+<p>Second, we have to tell our appliance about the order of different authentication methods.</p>
+<pre style="background-color: #f4f6f8;"><code>[edit]
+root@SRX# set system authentication-order radius 
+
+[edit]
+root@SRX# set system authentication-order password 
+
+</code></pre>
+<p>Third, login classes, credentials and template users respectively. The rest of the settings are applicable on the AAA server.</p>
+<pre style="background-color: #f4f6f8;"><code>[edit]
+root@SRX# edit system login 
+
+[edit system login]
+root@SRX# set class Admins deny-configuration &quot;(system root-authentication)|(system login)&quot;
+
+[edit system login]
+root@SRX# set class Remote-Admins idle-timeout 10
+
+[edit system login]
+root@SRX# set class Remote-Admins login-alarms
+
+[edit system login]
+root@SRX# set class Remote-Admins permissions all
+
+[edit system login]
+root@SRX# set class Remote-Admins allow-commands &quot;ping|exit&quot;
+
+[edit system login]
+root@SRX# set class Remote-Admins deny-commands &quot;(set cli idle-timeout)|(request system software)|(request system zeroize)|(request chassis)|(start)&quot;
+
+[edit system login]
+root@SRX# set class Remote-Admins deny-configuration &quot;(system root-authentication)|(system login)&quot;
+
+[edit system login]
+root@SRX# set user Remote-Admins class Remote-Admins
+
+[edit]
+root@SRX# commit 
+commit complete
+
+</code></pre>
+<h3><a id="For_your_reference_you_can_find_the_complete_configuration_in_both_hierarchical_and_set_format_respectively_429"></a>For your reference you can find the complete configuration in both “hierarchical” and “set” format respectively:</h3>
+<ul>
+<li>Hierarchical:</li>
+</ul>
+<pre style="background-color: #f4f6f8;"><code>system {
+    host-name SRX;
+    time-zone America/Los_Angeles;
+    authentication-order [ radius password ];
+    root-authentication {
+        encrypted-password &quot;$6$7zmIdYlm$jliwHiILg/OhC8cHkCZ8swk0hovyHnjZgmF73D2a5z2OdzWfutSZA0GNjt4nbEBPEqpZSDe2oh02Ph7Rx1Q7o/&quot;; ## SECRET-DATA
+    }
+    name-server {
+        192.168.100.202;
+    }
+    radius-server {
+        192.168.100.203 secret &quot;$9$NYVsgGDkTz6DitO1IcSwY2aDiHkm&quot;; ## SECRET-DATA
+    }
+    login {
+        message &quot;         ==================================================================================\n\t|                             KRYPTOMESH SECURITY TEAM                             |\n\t| Unauthorized access to this system is forbidden and will be prosecuted by law.   |\n\t| By accessing this system, you agree that your actions may be monitored if        |\n\t| unauthorized usage is suspected.                                                 |\n\t ==================================================================================\n&quot;;
+        class Admins {
+            idle-timeout 10;            
+            login-alarms;
+            permissions all;
+            deny-commands &quot;(set cli idle-timeout)|(request system software)|(request system zeroize)|(request chassis)|(start)&quot;;
+            deny-configuration &quot;(system root-authentication)|(system login)&quot;;
+        }
+        class Remote-Admins {
+            idle-timeout 10;
+            login-alarms;
+            permissions all;
+            allow-commands &quot;ping|exit&quot;;
+            deny-commands &quot;(set cli idle-timeout)|(request system software)|(request system zeroize)|(request chassis)|(start)&quot;;
+            deny-configuration &quot;(system root-authentication)|(system login)&quot;;
+        }
+        user Remote-Admins {
+            uid 2002;
+            class Remote-Admins;
+        }
+        user Younos {
+            uid 2004;
+            class Admins;
+            authentication {            
+                encrypted-password &quot;$6$XyCo2lPz$Omnr.SnnoEFTQt4/ao8E1dGMskIfqBWnpLSi4VG9iRxkpKZyG8TAg3RJxDwCRKwl1aFBEE2ekN50QyulNRoTe.&quot;; ## SECRET-DATA
+            }
+        }
+    }
+    services {
+        ssh {
+            root-login allow;
+        }
+        web-management {
+            https {
+                system-generated-certificate;
+            }
+        }
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        host 192.168.100.204 {
+            any any;
+        }
+        file Authentication {           
+            authorization info;
+        }
+        file Audit {
+            interactive-commands any;
+        }
+        file Processes {
+            daemon info;
+        }
+    }
+    ntp {
+        server 192.168.100.202;
+    }
+}
+security {
+    log {
+        mode event;
+        event-rate 1000;
+    }
+}
+interfaces {
+    fxp0 {
+        unit 0 {
+            family inet {               
+                address 192.168.100.200/24;
+            }
+        }
+    }
+}
+snmp {
+    name SRX;
+    description &quot;SRX Security Gateway&quot;;
+    location &quot;Rack 01&quot;;
+    view all {
+        oid .1;
+    }
+    community &quot;Junos@123@&quot; {
+        view all;
+        authorization read-only;
+        clients {
+            192.168.100.205/32;
+        }
+    }
+    trap-group SRX-Traps {
+        categories {
+            link;
+            configuration;              
+        }
+        targets {
+            192.168.100.205;
+        }
+    }
+}
+
+</code></pre>
+<ul>
+<li>Set:</li>
+</ul>
+<pre style="background-color: #f4f6f8;"><code>set system host-name SRX
+set system time-zone America/Los_Angeles
+set system authentication-order radius
+set system authentication-order password
+set system root-authentication encrypted-password &quot;$6$7zmIdYlm$jliwHiILg/OhC8cHkCZ8swk0hovyHnjZgmF73D2a5z2OdzWfutSZA0GNjt4nbEBPEqpZSDe2oh02Ph7Rx1Q7o/&quot;
+set system name-server 192.168.100.202
+set system radius-server 192.168.100.203 secret &quot;$9$NYVsgGDkTz6DitO1IcSwY2aDiHkm&quot;
+set system login message &quot;         ==================================================================================\n\t|                             KRYPTOMESH SECURITY TEAM                             |\n\t| Unauthorized access to this system is forbidden and will be prosecuted by law.   |\n\t| By accessing this system, you agree that your actions may be monitored if        |\n\t| unauthorized usage is suspected.                                                 |\n\t ==================================================================================\n&quot;
+set system login class Admins idle-timeout 10
+set system login class Admins login-alarms
+set system login class Admins permissions all
+set system login class Admins deny-commands &quot;(set cli idle-timeout)|(request system software)|(request system zeroize)|(request chassis)|(start)&quot;
+set system login class Admins deny-configuration &quot;(system root-authentication)|(system login)&quot;
+set system login class Remote-Admins idle-timeout 10
+set system login class Remote-Admins login-alarms
+set system login class Remote-Admins permissions all
+set system login class Remote-Admins allow-commands &quot;ping|exit&quot;
+set system login class Remote-Admins deny-commands &quot;(set cli idle-timeout)|(request system software)|(request system zeroize)|(request chassis)|(start)&quot;
+set system login class Remote-Admins deny-configuration &quot;(system root-authentication)|(system login)&quot;
+set system login user Remote-Admins uid 2002
+set system login user Remote-Admins class Remote-Admins
+set system login user Younos uid 2004
+set system login user Younos class Admins
+set system login user Younos authentication encrypted-password &quot;$6$XyCo2lPz$Omnr.SnnoEFTQt4/ao8E1dGMskIfqBWnpLSi4VG9iRxkpKZyG8TAg3RJxDwCRKwl1aFBEE2ekN50QyulNRoTe.&quot;
+set system services ssh root-login allow
+set system services web-management https system-generated-certificate
+set system syslog user * any emergency
+set system syslog host 192.168.100.204 any any
+set system syslog file Authentication authorization info
+set system syslog file Audit interactive-commands any
+set system syslog file Processes daemon info
+set system ntp server 192.168.100.202
+set security log mode event
+set security log event-rate 1000
+set interfaces fxp0 unit 0 family inet address 192.168.100.200/24
+set snmp name SRX
+set snmp description &quot;SRX Security Gateway&quot;
+set snmp location &quot;Rack 01&quot;             
+set snmp view all oid .1
+set snmp community &quot;Junos@123@&quot; view all
+set snmp community &quot;Junos@123@&quot; authorization read-only
+set snmp community &quot;Junos@123@&quot; clients 192.168.100.205/32
+set snmp trap-group SRX-Traps categories link
+set snmp trap-group SRX-Traps categories configuration
+set snmp trap-group SRX-Traps targets 192.168.100.205
+
+</code></pre>
