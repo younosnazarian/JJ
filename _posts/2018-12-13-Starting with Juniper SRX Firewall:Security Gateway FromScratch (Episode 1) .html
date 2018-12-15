@@ -167,7 +167,7 @@ ping: sendto: No route to host
 ping: sendto: No route to host
 
 </code></pre>
-<p>The name <strong><a href="http://yahoo.com">yahoo.com</a></strong> successfully resolved into its IP address <strong>“72.30.35.10”</strong>, however; it is not reachable. It’s because we haven’t yet defined a default route to provide Internet connectivity, but evidently, the DNS is working perfectly. I added “inet” after the ping command to make sure that the name will be resolved into IPv4.</p>
+<p>The name <strong>yahoo.com</strong> successfully resolved into its IP address <strong>“72.30.35.10”</strong>, however; it is not reachable. It’s because we haven’t yet defined a default route to provide Internet connectivity, but evidently, the DNS is working perfectly. I added “inet” after the ping command to make sure that the name will be resolved into IPv4.</p>
 <p><em>NOTE: Since in this scenario an internal DNS server is available and it’s reachable within the same subnet, we do not need to have a route.</em></p>
 <ul>
 <li><strong>Date &amp; Time:</strong> The commands are self-explanatory, but you have to keep it in mind to set the time zone and commit your configuration before setting up the time itself. The time could be set manually or be retrieved from an NTP server. Both of which has been shown. <em>NOTE: You use the command “run” when you want to execute the operational-mode commands in the configuration mode. It is similar to the command “do” on Cisco IOS.</em></li>
